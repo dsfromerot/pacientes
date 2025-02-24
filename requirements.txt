@@ -1,2 +1,2 @@
 Flask==2.3.2
-flask-oidc==1.4.0
+authlib==1.2.0
