@@ -23,7 +23,7 @@ EXPOSE 5002
 
 # Command to run the application
 # For development, use Flask's built-in server:
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5002"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5001"]
 
 # For production, use Gunicorn (uncomment the line below if using gunicorn):
-# CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5002", "app:app"]
+# CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5001", "app:app"]
