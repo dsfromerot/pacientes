@@ -1,20 +1,18 @@
-# Use an official Python runtime as a parent image
+# Usar una imagen base de Python
 FROM python:3.9-slim
 
-# Set the working directory
+# Establecer el directorio de trabajo
 WORKDIR /app
 
-# Copy the requirements file
+# Copiar los archivos de requerimientos e instalar dependencias
 COPY requirements.txt .
-
-# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code
+# Copiar el resto de los archivos
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 5001  # Change to 5002 for pruebas and 5003 for informes
+# Exponer el puerto en el que corre la aplicación
+EXPOSE 5001
 
-# Run the application
+# Comando para ejecutar la aplicación
 CMD ["python", "app.py"]
