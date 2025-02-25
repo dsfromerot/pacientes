@@ -1,53 +1,41 @@
-from flask import Flask, jsonify, redirect, url_for, session
-from authlib.integrations.flask_client import OAuth
+from flask import Flask, jsonify
+from flask_oidc import OpenIDConnect
+import os
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'  # Required for session management
-oauth = OAuth(app)
 
-# Configure Keycloak
-oauth.register(
-    name='keycloak',
-    client_id='pacientes',
-    client_secret='EFT9lXLLTEzb9ftI59VL83V2ykza1eUW',
-    authorize_url='http://100.124.235.117:8080/auth/realms/hospital-realm/protocol/openid-connect/auth',
-    access_token_url='http://100.124.235.117:8080/auth/realms/hospital-realm/protocol/openid-connect/token',
-    redirect_uri='http://100.93.128.110:5001/callback',
-    client_kwargs={'scope': 'openid profile email'},
-)
+# Configuración de Keycloak desde variables de entorno
+app.config.update({
+    'SECRET_KEY': os.getenv('FLASK_SECRET_KEY', 'secret'),
+    'OIDC_CLIENT_SECRETS': {
+        "web": {
+            "issuer": os.getenv('OIDC_ISSUER'),
+            "auth_uri": os.getenv('OIDC_AUTH_URI'),
+            "client_id": os.getenv('OIDC_CLIENT_ID'),
+            "client_secret": os.getenv('OIDC_CLIENT_SECRET'),
+            "redirect_uris": [os.getenv('OIDC_REDIRECT_URIS')],
+            "userinfo_uri": os.getenv('OIDC_USERINFO_URI'),
+            "token_uri": os.getenv('OIDC_TOKEN_URI'),
+            "token_introspection_uri": os.getenv('OIDC_INTROSPECTION_URI')
+        }
+    },
+    'OIDC_ID_TOKEN_COOKIE_SECURE': False,
+    'OIDC_REQUIRE_VERIFIED_EMAIL': False,
+    'OIDC_USER_INFO_ENABLED': True,
+    'OIDC_SCOPES': ['openid', 'email', 'profile'],
+    'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
+})
+oidc = OpenIDConnect(app)
 
-@app.route('/login')
-def login():
-    # Redirect the user to Keycloak for authentication
-    redirect_uri = url_for('callback', _external=True)
-    return oauth.keycloak.authorize_redirect(redirect_uri)
-
-@app.route('/callback')
-def callback():
-    try:
-        # Exchange the authorization code for an access token
-        token = oauth.keycloak.authorize_access_token()
-        if not token:
-            return jsonify({"error": "Error en la autenticación"}), 401
-        
-        # Store the token in the session
-        session['token'] = token
-        return redirect(url_for('get_pacientes'))
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+# Datos hardcodeados
+pacientes = [
+    {"nombre": "Juan Perez", "edad": 30, "enfermedad": "Gripe"},
+    {"nombre": "Maria Lopez", "edad": 25, "enfermedad": "Fiebre"}
+]
 
 @app.route('/pacientes', methods=['GET'])
+@oidc.accept_token(True)  # Protege la ruta con Keycloak
 def get_pacientes():
-    # Check if the user is authenticated by verifying the token in the session
-    token = session.get('token')
-    if not token:
-        return jsonify({"error": "Acceso no autorizado"}), 401
-    
-    # Return protected data
-    pacientes = [
-        {"nombre": "Juan Perez", "edad": 30, "enfermedad": "Gripe"},
-        {"nombre": "Maria Lopez", "edad": 25, "enfermedad": "Fiebre"}
-    ]
     return jsonify(pacientes)
 
 if __name__ == '__main__':
