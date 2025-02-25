@@ -17,3 +17,12 @@ app.config.update({
 
 # Inicializar la extensión Flask-OIDC
 oidc = OpenIDConnect(app)
+
+# Ruta de prueba
+@app.route('/')
+def hello():
+    return "¡El microservicio de pacientes está en ejecución!"
+
+# Punto de entrada para ejecutar la aplicación
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5001)
