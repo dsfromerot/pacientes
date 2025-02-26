@@ -16,5 +16,7 @@ COPY . .
 # Exponer el puerto en el que corre la aplicación
 EXPOSE 5001
 
+ENV PYTHONPATH=/app
+
 # Comando para ejecutar la aplicación
-CMD ["python", "app/config.py"]
+CMD ["python", "-m", "app.config"]
