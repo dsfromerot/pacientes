@@ -20,4 +20,4 @@ ENV PYTHONPATH=/app
 EXPOSE 5001
 
 # Comando para ejecutar la aplicación
-CMD ["python", "-m", "app.config"]
+CMD ["python", "-c", "from app.config import start; start()"]
