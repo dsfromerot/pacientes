@@ -20,4 +20,5 @@ ENV PYTHONPATH=/app
 EXPOSE 5001
 
 # Comando para ejecutar la aplicación
-CMD ["python", "-c", "from app.config import start; start()"]
+RUN pip install gunicorn
+CMD gunicorn --bind 0.0.0.0:5001 "app.config:start()"
