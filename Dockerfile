@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Configurar PYTHONPATH para evitar problemas de importación
-ENV PYTHONPATH=/app/app
+ENV PYTHONPATH=/app
 
 # Exponer el puerto en el que corre la aplicación
 EXPOSE 5001
