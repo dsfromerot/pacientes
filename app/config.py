@@ -16,8 +16,14 @@ app.config.update({
 
 oidc = OpenIDConnect(app)
 
-if __name__ == "__main__":
+if __name__ != "__main__":
+    from app import routes  # Importar rutas solo si Flask no se ejecuta como módulo
+
+def start():
     app.run(host="0.0.0.0", port=5001, debug=True)
+
+if __name__ == "__main__":
+    start()
 
 # Importar rutas aquí para evitar importaciones circulares
 from app import routes
