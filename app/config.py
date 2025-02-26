@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # Configuración de Flask y Keycloak
 app.config.update({
-    'SECRET_KEY': 'secret',  
+    'SECRET_KEY': 'secret',
     'OIDC_CLIENT_SECRETS': '/app/client_secrets.json',  # Ruta absoluta
     'OIDC_ID_TOKEN_COOKIE_SECURE': False,
     'OIDC_REQUIRE_VERIFIED_EMAIL': False,
@@ -16,14 +16,9 @@ app.config.update({
 
 oidc = OpenIDConnect(app)
 
-if __name__ != "__main__":
-    from app import routes  # Importar rutas solo si Flask no se ejecuta como módulo
+# Importar rutas después de inicializar Flask para evitar errores de importación circular
+from app import routes  
 
+# Gunicorn busca esta función para iniciar Flask
 def start():
-    app.run(host="0.0.0.0", port=5001, debug=True)
-
-if __name__ == "__main__":
-    start()
-
-# Importar rutas aquí para evitar importaciones circulares
-from app import routes
+    return app
