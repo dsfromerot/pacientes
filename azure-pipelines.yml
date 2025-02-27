@@ -30,8 +30,8 @@ stages:
           - task: SSH@0
             displayName: "Desplegar en la VM"
             inputs:
-              sshEndpoint: "vm-hospital"
+              sshEndpoint: "servicios"
               run: |
-                cd /home/azureuser/deploy
+                cd /home/azureuser
                 docker-compose pull
                 docker-compose up -d
