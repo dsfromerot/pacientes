@@ -17,14 +17,9 @@ stages:
               cd /home/azureuser/pacientes/
               git pull
 
-              cd /home/azureuser/pruebas/
-              git pull
-
-              cd /home/azureuser/informes/
-              git pull
-
               echo "Construyendo imágenes Docker..."
               cd /home/azureuser/
+              docker-compose down
               docker-compose build
               docker-compose up -d
             displayName: "Construir y ejecutar contenedores"
