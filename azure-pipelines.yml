@@ -1,37 +1,20 @@
 trigger:
   branches:
     include:
-      - main  # Se ejecuta en cada push a main
+      - main
 
 pool:
-  vmImage: ubuntu-latest
-
-variables:
-  DOCKER_IMAGE: "hospitalacr.azurecr.io/pacientes"
+  name: servicios  # Usar el agente self-hosted en la VM
 
 stages:
-  - stage: Build
-    jobs:
-      - job: BuildDocker
-        steps:
-          - checkout: self
-          - task: Docker@2
-            displayName: "Build Docker Image"
-            inputs:
-              command: build
-              dockerfile: Dockerfile
-              repository: $(DOCKER_IMAGE)
-              tags: latest
-
   - stage: Deploy
     jobs:
       - job: DeployToVM
         steps:
-          - task: SSH@0
-            displayName: "Desplegar en la VM"
-            inputs:
-              sshEndpoint: "servicios"
-              run: |
-                cd /home/azureuser
-                docker-compose pull
-                docker-compose up -d
+          - checkout: self
+          - script: |
+              echo "Construyendo imágenes Docker..."
+              cd /home/azureuser/
+              docker-compose build
+              docker-compose up -d
+            displayName: "Construir y ejecutar contenedores"
