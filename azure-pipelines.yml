@@ -1,22 +1,37 @@
 trigger:
-- main
+  branches:
+    include:
+      - main  # Se ejecuta en cada push a main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: ubuntu-latest
 
-steps:
-- script: |
-    echo "Instalando dependencias"
-    pip install -r requirements.txt
-  displayName: 'Instalar dependencias'
+variables:
+  DOCKER_IMAGE: "hospitalacr.azurecr.io/pacientes"
 
-- script: |
-    echo "Ejecutando pruebas"
-    pytest
-  displayName: 'Ejecutar pruebas'
+stages:
+  - stage: Build
+    jobs:
+      - job: BuildDocker
+        steps:
+          - checkout: self
+          - task: Docker@2
+            displayName: "Build Docker Image"
+            inputs:
+              command: build
+              dockerfile: Dockerfile
+              repository: $(DOCKER_IMAGE)
+              tags: latest
 
-- task: AzureWebApp@1
-  inputs:
-    azureSubscription: 'your-azure-subscription'
-    appName: 'pacientes-app'
-    package: '$(Build.ArtifactStagingDirectory)'
+  - stage: Deploy
+    jobs:
+      - job: DeployToVM
+        steps:
+          - task: SSH@0
+            displayName: "Desplegar en la VM"
+            inputs:
+              sshEndpoint: "vm-hospital"
+              run: |
+                cd /home/azureuser/deploy
+                docker-compose pull
+                docker-compose up -d
